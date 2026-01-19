@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ServiceItem } from '../types';
+import { ServiceItem } from '../types.ts';
 
 const services: ServiceItem[] = [
   { id: '1', number: '01', icon: 'smart_toy', title: 'AI Automation', description: 'Streamline creative workflows by integrating intelligent agents that handle repetitive tasks with precision.' },

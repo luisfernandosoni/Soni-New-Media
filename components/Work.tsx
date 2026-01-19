@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { WorkItem } from '../types';
+import { WorkItem } from '../types.ts';
 
 const works: WorkItem[] = [
   { 

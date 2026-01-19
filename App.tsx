@@ -1,10 +1,10 @@
 import React from 'react';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import Services from './components/Services';
-import Work from './components/Work';
-import DesignPhilosophy from './components/DesignPhilosophy';
-import Footer from './components/Footer';
+import Navbar from './components/Navbar.tsx';
+import Hero from './components/Hero.tsx';
+import Services from './components/Services.tsx';
+import Work from './components/Work.tsx';
+import DesignPhilosophy from './components/DesignPhilosophy.tsx';
+import Footer from './components/Footer.tsx';
 
 const App: React.FC = () => {
   return (
