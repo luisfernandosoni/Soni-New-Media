@@ -1,16 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '../context/LanguageContext.tsx';
+import { CloudflareImage } from './CloudflareImage.tsx';
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const { language, setLanguage, t } = useLanguage();
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
+    const initialTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+    setTheme(initialTheme);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    if (newTheme === 'dark') document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+  };
 
   return (
     <motion.nav
@@ -19,49 +33,88 @@ const Navbar: React.FC = () => {
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       className={`fixed top-0 w-full z-50 transition-all duration-500 border-b ${
         isScrolled
-          ? 'bg-background/80 backdrop-blur-xl border-white/10 py-4'
-          : 'bg-transparent border-transparent py-6'
+          ? 'bg-background/80 backdrop-blur-xl border-border py-3'
+          : 'bg-transparent border-transparent py-5'
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-        {/* Logo Area */}
-        <div className="flex items-center gap-3 group cursor-pointer">
-          <div className="relative h-8 w-8 overflow-hidden">
-             <img 
+        {/* Brand Section: Logo maximized, text removed */}
+        <div className="flex items-center group cursor-pointer relative">
+          <div className="h-12 w-12 flex items-center justify-center">
+             <CloudflareImage 
+              name="SoniNewMedia.png"
               alt="Soní Logo" 
-              className="h-full w-full object-contain invert transition-transform duration-500 group-hover:scale-110" 
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDj-4Q2WkLako8D3eq3-VcJbu2DnxRjHwY5mmRKmTYdNK4Oqev7p1akiGsxQAn53O0HR0pT5dwWlI1hTFBRlplYL3wlu0YA1eNAIlGdrBGLuSP4NifEEnQPOelLDwZkIUo0PmaDspKxdqOzZxtxQ3sHgZd8Xc4rT1DIe5_XUyTGTIc8cGtjanVqwWgbfIILclHgZy8A1ydNtR5PP9Vo31tUwKqoo5pP6iMHsP-Da2tGmiw3F5NQw5I0uIEW9NdbCJ4dxcXTl4NiMdty"
+              priority={true}
+              className="h-full w-full object-contain dark:invert transition-transform duration-500 group-hover:scale-110 will-change-transform" 
             />
           </div>
-          <span className="font-display font-medium text-lg tracking-tight text-white/90 group-hover:text-white transition-colors">
-            soní new media
-          </span>
         </div>
 
-        {/* Desktop Links */}
-        <div className="hidden md:flex items-center space-x-10 text-sm font-medium tracking-wide">
-          {['Services', 'Work', 'About'].map((item) => (
-            <a
-              key={item}
-              href={`#${item.toLowerCase()}`}
-              className="text-gray-400 hover:text-white transition-colors relative group"
+        <div className="flex items-center space-x-8">
+          <div className="hidden lg:flex items-center space-x-8 text-sm font-medium tracking-wide">
+            {['services', 'work', 'about'].map((item) => (
+              <a
+                key={item}
+                href={`#${item}`}
+                className="text-secondary hover:text-text transition-colors relative group uppercase text-[10px] tracking-widest"
+              >
+                {t(`nav.${item}`)}
+                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-accent transition-all duration-300 group-hover:w-full" />
+              </a>
+            ))}
+          </div>
+          
+          <div className="flex items-center gap-4 border-l border-border pl-8">
+            {/* Language Switcher */}
+            <div className="flex bg-subtle rounded-full p-1 border border-border">
+              {(['en', 'es'] as const).map((lang) => (
+                <button
+                  key={lang}
+                  onClick={() => setLanguage(lang)}
+                  className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase transition-all duration-300 ${
+                    language === lang 
+                    ? 'bg-accent text-background shadow-sm' 
+                    : 'text-secondary hover:text-text'
+                  }`}
+                >
+                  {lang}
+                </button>
+              ))}
+            </div>
+
+            {/* Theme Toggle */}
+            <button 
+              onClick={toggleTheme}
+              className="w-14 h-8 rounded-full bg-subtle relative flex items-center p-1 transition-colors border border-border"
+              aria-label="Toggle Theme"
             >
-              {item}
-              <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-white transition-all duration-300 group-hover:w-full" />
-            </a>
-          ))}
+              <motion.div
+                animate={{ x: theme === 'dark' ? 24 : 0 }}
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                className="w-6 h-6 rounded-full bg-accent flex items-center justify-center shadow-sm"
+              >
+                <AnimatePresence mode="wait">
+                  <motion.span 
+                    key={theme}
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.5 }}
+                    className="material-icons-outlined text-[14px] text-background select-none"
+                  >
+                    {theme === 'dark' ? 'dark_mode' : 'light_mode'}
+                  </motion.span>
+                </AnimatePresence>
+              </motion.div>
+            </button>
+          </div>
+
           <a
             href="#contact"
-            className="bg-white text-black px-6 py-2.5 rounded-full hover:bg-gray-200 transition-all transform hover:scale-105 active:scale-95 font-semibold"
+            className="hidden md:block bg-accent text-background px-6 py-2.5 rounded-full hover:opacity-90 transition-all font-semibold text-xs uppercase tracking-widest"
           >
-            Contact
+            {t('nav.contact')}
           </a>
         </div>
-
-        {/* Mobile Menu Icon */}
-        <button className="md:hidden text-white p-2">
-          <span className="material-icons-outlined">menu</span>
-        </button>
       </div>
     </motion.nav>
   );
