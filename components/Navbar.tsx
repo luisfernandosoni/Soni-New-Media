@@ -38,14 +38,14 @@ const Navbar: React.FC = () => {
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-        {/* Brand Section: Logo maximized, text removed */}
         <div className="flex items-center group cursor-pointer relative">
           <div className="h-12 w-12 flex items-center justify-center">
              <CloudflareImage 
               name="SoniNewMedia.png"
               alt="Soní Logo" 
               priority={true}
-              className="h-full w-full object-contain dark:invert transition-transform duration-500 group-hover:scale-110 will-change-transform" 
+              width={96} // Request 2x size for Retina display clarity
+              className="h-full w-full dark:invert transition-transform duration-500 group-hover:scale-110 will-change-transform" 
             />
           </div>
         </div>
@@ -65,7 +65,6 @@ const Navbar: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-4 border-l border-border pl-8">
-            {/* Language Switcher */}
             <div className="flex bg-subtle rounded-full p-1 border border-border">
               {(['en', 'es'] as const).map((lang) => (
                 <button
@@ -82,7 +81,6 @@ const Navbar: React.FC = () => {
               ))}
             </div>
 
-            {/* Theme Toggle */}
             <button 
               onClick={toggleTheme}
               className="w-14 h-8 rounded-full bg-subtle relative flex items-center p-1 transition-colors border border-border"
