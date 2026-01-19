@@ -1,4 +1,3 @@
-
 {
   "name": "soni-new-media-2026",
   "private": true,
@@ -15,10 +14,10 @@
     "framer-motion": "^12.0.0"
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "typescript": "^5.7.0",
     "vite": "^6.0.0"
-    "@vitejs/plugin-react": "^4.2.1"
   }
 }
