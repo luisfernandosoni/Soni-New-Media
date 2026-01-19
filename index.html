@@ -5,15 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Soni New Media</title>
     
-    <!-- Google Fonts: Inter (UI) and Space Grotesk (Display) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
 
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       (function() {
@@ -47,27 +43,40 @@
         --background: #F5F5F7;
         --surface: #FFFFFF;
         --accent: #000000;
+        --accent-rgb: 0, 0, 0;
         --subtle: #EBEBEB;
         --text-primary: #1D1D1F;
         --text-secondary: #6E6E73;
         --border-color: rgba(0, 0, 0, 0.08);
-        transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        --mouse-x: -100px;
+        --mouse-y: -100px;
+        --cursor-aura-weight: 1.5px;
+        transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       .dark {
         --background: #050505;
         --surface: #121212;
         --accent: #FFFFFF;
+        --accent-rgb: 255, 255, 255;
         --subtle: #1C1C1E;
         --text-primary: #F5F5F7;
         --text-secondary: #86868B;
         --border-color: rgba(255, 255, 255, 0.08);
+        --cursor-aura-weight: 1px;
       }
 
-      body {
+      html, body {
         background-color: var(--background);
         color: var(--text-primary);
         -webkit-font-smoothing: antialiased;
+        cursor: none !important;
+        overflow-x: hidden;
+      }
+
+      ::selection {
+        background: var(--accent);
+        color: var(--background);
       }
       
       .noise-overlay {
@@ -79,22 +88,32 @@
         background-image: url("https://grainy-gradients.vercel.app/noise.svg");
       }
 
-      .dark .noise-overlay {
-        opacity: 0.05;
-        filter: invert(1);
+      /* High-performance hover interactions */
+      a:hover ~ #root #custom-cursor-aura,
+      button:hover ~ #root #custom-cursor-aura {
+        transform: scale(2.2);
+        background: rgba(var(--accent-rgb), 0.05);
+        border-width: 0.5px;
       }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "framer-motion": "https://esm.sh/framer-motion@^12.27.1",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3"
-  }
-}
-</script>
-</head>
+    <script type="module">
+      const root = document.documentElement;
+      window.addEventListener('pointermove', (e) => {
+        root.style.setProperty('--mouse-x', `${e.clientX}px`);
+        root.style.setProperty('--mouse-y', `${e.clientY}px`);
+      }, { passive: true });
+    </script>
+    <script type="importmap">
+    {
+      "imports": {
+        "framer-motion": "https://esm.sh/framer-motion@^12.27.1",
+        "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+        "react/": "https://esm.sh/react@^19.2.3/",
+        "react": "https://esm.sh/react@^19.2.3"
+      }
+    }
+    </script>
+  </head>
   <body>
     <div id="root"></div>
     <div class="noise-overlay"></div>

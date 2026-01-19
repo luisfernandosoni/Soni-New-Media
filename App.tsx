@@ -6,11 +6,13 @@ import Services from './components/Services.tsx';
 import Work from './components/Work.tsx';
 import DesignPhilosophy from './components/DesignPhilosophy.tsx';
 import Footer from './components/Footer.tsx';
+import { CustomCursor } from './components/CustomCursor.tsx';
 
 const App: React.FC = () => {
   return (
     <LanguageProvider>
       <div className="relative w-full min-h-screen bg-background text-text selection:bg-accent selection:text-background transition-colors duration-500 overflow-x-hidden">
+        <CustomCursor />
         <Navbar />
         <main>
           <Hero />
