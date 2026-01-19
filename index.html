@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="dark scroll-smooth">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,11 +12,7 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-      (function() {
-        const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        if (theme === 'dark') document.documentElement.classList.add('dark');
-      })();
-
+      // Permanent Dark Mode Configuration
       tailwind.config = {
         darkMode: "class",
         theme: {
@@ -25,6 +21,7 @@
               background: "var(--background)",
               surface: "var(--surface)",
               accent: "var(--accent)",
+              "accent-contrast": "var(--accent-contrast)",
               subtle: "var(--subtle)",
               text: "var(--text-primary)",
               secondary: "var(--text-secondary)",
@@ -40,30 +37,21 @@
     </script>
     <style>
       :root {
-        --background: #F5F5F7;
-        --surface: #FFFFFF;
-        --accent: #000000;
-        --accent-rgb: 0, 0, 0;
-        --subtle: #EBEBEB;
-        --text-primary: #1D1D1F;
-        --text-secondary: #6E6E73;
-        --border-color: rgba(0, 0, 0, 0.08);
-        --mouse-x: -100px;
-        --mouse-y: -100px;
-        --cursor-aura-weight: 1.5px;
-        transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      .dark {
+        /* Sentient Dark Palette - Consolidated from .dark */
+        color-scheme: dark;
         --background: #050505;
         --surface: #121212;
         --accent: #FFFFFF;
+        --accent-contrast: #000000;
         --accent-rgb: 255, 255, 255;
         --subtle: #1C1C1E;
         --text-primary: #F5F5F7;
         --text-secondary: #86868B;
         --border-color: rgba(255, 255, 255, 0.08);
+        --mouse-x: -100px;
+        --mouse-y: -100px;
         --cursor-aura-weight: 1px;
+        transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       html, body {
@@ -76,7 +64,7 @@
 
       ::selection {
         background: var(--accent);
-        color: var(--background);
+        color: var(--accent-contrast);
       }
       
       .noise-overlay {
@@ -88,7 +76,6 @@
         background-image: url("https://grainy-gradients.vercel.app/noise.svg");
       }
 
-      /* High-performance hover interactions */
       a:hover ~ #root #custom-cursor-aura,
       button:hover ~ #root #custom-cursor-aura {
         transform: scale(2.2);

@@ -1,12 +1,13 @@
+
 import React from 'react';
 import { useLanguage } from '../context/LanguageContext.tsx';
-import { CloudflareImage } from './CloudflareImage.tsx';
+import { Logo } from './Logo.tsx';
 
 const Footer: React.FC = () => {
   const { t } = useLanguage();
 
   return (
-    <footer id="contact" className="bg-background pt-32 pb-12 border-t border-border transition-colors duration-500">
+    <footer id="contact" className="footer bg-background pt-32 pb-12 border-t border-border transition-colors duration-500">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex flex-col lg:flex-row justify-between items-start gap-20 mb-32">
           <div className="max-w-2xl">
@@ -47,14 +48,8 @@ const Footer: React.FC = () => {
         
         <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-border text-xs text-secondary/60">
           <div className="flex items-center gap-4 mb-4 md:mb-0">
-            <div className="h-8 w-auto opacity-40 dark:invert-0 invert transition-all">
-               <CloudflareImage 
-                name="SoniNewMedia.png"
-                alt="Soní Logo Small" 
-                className="h-full w-auto" 
-              />
-            </div>
-            <span>© 2026 Soní New Media.</span>
+            <Logo size={24} className="opacity-40 grayscale brightness-200 hover:opacity-100 hover:grayscale-0 transition-all duration-500" />
+            <span className="ml-2">© 2026 Soní New Media.</span>
           </div>
           <div className="flex gap-8">
             <a href="#" className="hover:text-text transition-colors">{t('footer.privacy')}</a>
