@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { motion, useSpring, useTransform } from 'motion/react';
 import { useKinetic } from '../context/KineticContext.tsx';
 
 export const CustomCursor: React.FC = () => {
-  const { mouseX, mouseY, velX, velY } = useKinetic();
+  // FIX #MCRD: Extraemos isMobile para apagar el cursor en celulares
+  const { mouseX, mouseY, velX, velY, isMobile } = useKinetic();
 
   // Optimized Speed Calculation
   const speed = useTransform([velX, velY], ([vx, vy]) => 
@@ -23,6 +23,10 @@ export const CustomCursor: React.FC = () => {
   const springConfig = { damping: 40, stiffness: 450, mass: 0.2 };
   const springX = useSpring(mouseX, springConfig);
   const springY = useSpring(mouseY, springConfig);
+
+  // FIX #MCRD: KILL SWITCH - Si es móvil, no renderizamos nada visual.
+  // El usuario controlará la luz de las tarjetas con el giroscopio, pero sin ver la bolita.
+  if (isMobile) return null;
 
   return (
     <div className="fixed inset-0 z-[10000] pointer-events-none overflow-hidden">

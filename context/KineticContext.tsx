@@ -21,14 +21,12 @@ export const KineticProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const desktopY = useMotionValue(0);
 
   // 3. Suavizado SELECTIVO (Solo para el Giroscopio)
-  // El giroscopio es ruidoso, necesita este filtro para no temblar.
   const gyroSpringConfig = { damping: 30, stiffness: 100, mass: 0.5 };
   const smoothVirtualX = useSpring(virtualX, gyroSpringConfig);
   const smoothVirtualY = useSpring(virtualY, gyroSpringConfig);
 
   // 4. EL BYPASS DE LATENCIA (La corrección #MCRD)
-  // Si es Desktop -> Pasamos desktopX directo (RAW). Cero Lag.
-  // Si es Móvil   -> Pasamos smoothVirtualX (Filtered). Experiencia Premium.
+  // Desktop = Crudo (Cero Lag) | Móvil = Suave (Sin temblor)
   const finalX = isMobile ? smoothVirtualX : desktopX;
   const finalY = isMobile ? smoothVirtualY : desktopY;
 
@@ -37,7 +35,6 @@ export const KineticProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   useEffect(() => {
     if (isMobile) {
-      // Lógica de desbloqueo de sensores para iOS
       const unlockSensors = () => {
         requestGyroAccess();
         window.removeEventListener('click', unlockSensors);
@@ -48,9 +45,7 @@ export const KineticProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return;
     }
 
-    // Lógica Desktop Standard (Event Loop Directo)
     const handlePointerMove = (e: PointerEvent) => {
-      // Set directo sin intermediarios = Latencia Cero
       desktopX.set(e.clientX);
       desktopY.set(e.clientY);
     };
@@ -80,7 +75,7 @@ export const useKinetic = () => {
   return context;
 };
 
-// Hook de ayuda para movimiento relativo (Sin cambios)
+// Helper de movimiento relativo (Sin cambios)
 export const useRelativeMotion = (ref: React.RefObject<HTMLElement | null>) => {
   const { mouseX, mouseY } = useKinetic();
 

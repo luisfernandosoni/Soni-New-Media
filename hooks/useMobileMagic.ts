@@ -1,21 +1,24 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useMotionValue } from 'motion/react';
 
 export const useMobileMagic = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [gyroAvailable, setGyroAvailable] = useState(false);
 
-  // El "Mouse Fantasma"
-  const virtualX = useMotionValue(0);
-  const virtualY = useMotionValue(0);
+  // Inicializamos en el CENTRO para evitar que el aura se pegue en la esquina (0,0) al cargar
+  const virtualX = useMotionValue(typeof window !== 'undefined' ? window.innerWidth / 2 : 0);
+  const virtualY = useMotionValue(typeof window !== 'undefined' ? window.innerHeight / 2 : 0);
+
+  // Referencias para el algoritmo de "Centro Flotante"
+  const refBeta = useRef<number | null>(null);
+  const refGamma = useRef<number | null>(null);
 
   useEffect(() => {
-    // 1. Detección de entorno táctil
     const checkMobile = () => {
       const isTouch = window.matchMedia('(pointer: coarse)').matches;
       setIsMobile(isTouch);
       
-      // Fallback inicial: Cursor en el centro absoluto de la pantalla
+      // Si redimensionan (rotan pantalla), recentramos
       if (isTouch) {
         virtualX.set(window.innerWidth / 2);
         virtualY.set(window.innerHeight / 2);
@@ -25,28 +28,43 @@ export const useMobileMagic = () => {
     checkMobile();
     window.addEventListener('resize', checkMobile);
 
-    // 2. Lógica del Giroscopio (Sensor Fusion)
     const handleOrientation = (event: DeviceOrientationEvent) => {
-      // Si recibimos ceros absolutos, el sensor no está listo o no existe
       if (event.beta === null || event.gamma === null) return;
-      
       setGyroAvailable(true);
 
-      // Calibración de Sensibilidad (Grados máximos de inclinación)
-      const MAX_TILT = 15; 
-      
-      // Eje X (Gamma): De -15 a 15 grados -> 0 a Ancho Pantalla
-      const gamma = Math.min(Math.max(event.gamma, -MAX_TILT), MAX_TILT);
-      const normalizedX = ((gamma + MAX_TILT) / (MAX_TILT * 2)) * window.innerWidth;
+      const currentBeta = event.beta; 
+      const currentGamma = event.gamma;
 
-      // Eje Y (Beta): De 30 a 60 grados (posición natural de mano) -> 0 a Alto Pantalla
-      const baseBeta = 45; // Ángulo natural de sostener el cel
-      const beta = Math.min(Math.max(event.beta - baseBeta, -MAX_TILT), MAX_TILT);
-      const normalizedY = ((beta + MAX_TILT) / (MAX_TILT * 2)) * window.innerHeight;
+      // 1. Inicialización (Primera lectura es el centro)
+      if (refBeta.current === null || refGamma.current === null) {
+        refBeta.current = currentBeta;
+        refGamma.current = currentGamma;
+        return;
+      }
 
-      // Inyectamos coordenadas crudas (el Spring del Contexto las suavizará)
-      virtualX.set(normalizedX);
-      virtualY.set(normalizedY);
+      // 2. Algoritmo "Soft Drift" (Recalibración silenciosa)
+      // Si mantienes el cel inclinado, el centro se mueve hacia ti lentamente.
+      const driftFactor = 0.02;
+      refBeta.current += (currentBeta - refBeta.current) * driftFactor;
+      refGamma.current += (currentGamma - refGamma.current) * driftFactor;
+
+      // 3. Cálculo del Delta
+      const deltaBeta = currentBeta - refBeta.current;
+      const deltaGamma = currentGamma - refGamma.current;
+
+      // 4. Sensibilidad (25 grados = Pantalla completa)
+      const MAX_TILT = 25; 
+
+      // Mapeo a Coordenadas de Pantalla
+      const x = (window.innerWidth / 2) + ((deltaGamma / MAX_TILT) * (window.innerWidth / 2));
+      const y = (window.innerHeight / 2) + ((deltaBeta / MAX_TILT) * (window.innerHeight / 2));
+
+      // 5. Límites (Clamping)
+      const clampedX = Math.max(0, Math.min(window.innerWidth, x));
+      const clampedY = Math.max(0, Math.min(window.innerHeight, y));
+
+      virtualX.set(clampedX);
+      virtualY.set(clampedY);
     };
 
     if (isMobile) {
@@ -59,18 +77,15 @@ export const useMobileMagic = () => {
     };
   }, [isMobile, virtualX, virtualY]);
 
-  // 3. Trigger para iOS 13+ (Requiere toque del usuario)
   const requestGyroAccess = async () => {
-    // @ts-ignore - Propiedad específica de WebKit
-    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+    // @ts-ignore
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
       try {
         // @ts-ignore
         const permission = await DeviceOrientationEvent.requestPermission();
-        if (permission === 'granted') {
-          setGyroAvailable(true);
-        }
+        if (permission === 'granted') setGyroAvailable(true);
       } catch (e) {
-        console.log("Gyroscope permission denied/error", e);
+        console.error("Gyro error:", e);
       }
     }
   };
