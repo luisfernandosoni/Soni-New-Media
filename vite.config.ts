@@ -6,8 +6,7 @@ const stripFallbacks = () => {
   return {
     name: 'mcrd-strip-fallbacks',
     transformIndexHtml(html: string) {
-      // OJO AQUÍ: Copia TODA la línea, incluyendo los comentarios dentro del regex
-      return html.replace(/[\s\S]*?/gi, '');
+      return html.replace(/<!-- ::FALLBACK_START:: -->[\s\S]*?<!-- ::FALLBACK_END:: -->/gi, '');
     },
   };
 };
