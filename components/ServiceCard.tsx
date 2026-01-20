@@ -40,17 +40,19 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
   const smoothX = useSpring(activeX, springConfig);
   const smoothY = useSpring(activeY, springConfig);
 
+  // Constraints: Rotation degrees remain untouched (10 / -10)
   const rotateX = useTransform(smoothY, [0, 1], [10, -10]);
   const rotateY = useTransform(smoothX, [0, 1], [-10, 10]);
   
-  const tier1X = useTransform(smoothX, [0, 1], [20, -20]);
-  const tier1Y = useTransform(smoothY, [0, 1], [20, -20]);
+  // Parallax Tiers: High-relief separation values from previous v3 audit
+  const tier1X = useTransform(smoothX, [0, 1], [32, -32]);
+  const tier1Y = useTransform(smoothY, [0, 1], [32, -32]);
   
-  const tier2X = useTransform(smoothX, [0, 1], [10, -10]);
-  const tier2Y = useTransform(smoothY, [0, 1], [10, -10]);
+  const tier2X = useTransform(smoothX, [0, 1], [18, -18]);
+  const tier2Y = useTransform(smoothY, [0, 1], [18, -18]);
   
-  const tier3X = useTransform(smoothX, [0, 1], [5, -5]);
-  const tier3Y = useTransform(smoothY, [0, 1], [5, -5]);
+  const tier3X = useTransform(smoothX, [0, 1], [10, -10]);
+  const tier3Y = useTransform(smoothY, [0, 1], [10, -10]);
 
   const idleBreathe = useTransform(time, (t: number) => 1 + Math.sin((t + index * 500) / 4000) * 0.003);
   const transform = useMotionTemplate`rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${idleBreathe})`;
@@ -81,7 +83,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative h-[540px] group"
+      className="relative h-[460px] group" // Optimized height from 540px
       style={{ perspective: 2000 }}
     >
       <motion.div
@@ -120,18 +122,18 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
           style={{ 
             x: tier1X, 
             y: tier1Y, 
-            translateZ: 100,
+            translateZ: 165,
             transformStyle: 'preserve-3d'
           } as any}
-          className="flex justify-between items-start relative z-10 h-24 lg:h-32 mb-6 pointer-events-none"
+          className="flex justify-between items-start relative z-10 h-20 lg:h-24 mb-4 pointer-events-none"
         >
           {isCTA ? (
             <span className="text-nano font-mono font-bold text-black/25 tracking-widest-2x uppercase pt-2">
               End_Sequence
             </span>
           ) : (
-            <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-2xl bg-white/[0.08] border border-white/15 flex items-center justify-center group-hover:bg-white group-hover:border-white group-hover:shadow-[0_0_60px_rgba(255,255,255,0.3)] transition-all duration-1000 shadow-2xl">
-              <span className="material-icons-outlined text-3xl lg:text-4xl text-white group-hover:text-black transition-colors duration-700 select-none">
+            <div className="w-14 h-14 lg:w-16 lg:h-16 rounded-2xl bg-white/[0.08] border border-white/15 flex items-center justify-center group-hover:bg-white group-hover:border-white group-hover:shadow-[0_0_60px_rgba(255,255,255,0.3)] transition-all duration-1000 shadow-2xl">
+              <span className="material-icons-outlined text-2xl lg:text-3xl text-white group-hover:text-black transition-colors duration-700 select-none">
                 {item?.icon}
               </span>
             </div>
@@ -145,12 +147,12 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
           style={{ 
             x: tier2X, 
             y: tier2Y, 
-            translateZ: 60,
+            translateZ: 105,
             transformStyle: 'preserve-3d'
           } as any}
           className={`relative z-10 flex-grow flex flex-col pointer-events-none ${isCTA ? 'items-center text-center' : ''}`}
         >
-          <div className="min-h-[2.5em] lg:min-h-[2.2em] mb-6 w-full relative">
+          <div className="min-h-[2.2em] mb-4 w-full relative">
             <AnimatePresence mode="wait">
               <motion.h3 
                 key={language}
@@ -163,7 +165,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
             </AnimatePresence>
           </div>
           
-          <motion.div style={{ x: tier3X, y: tier3Y, translateZ: 30 } as any} className="relative min-h-[4em]">
+          <motion.div style={{ x: tier3X, y: tier3Y, translateZ: 55 } as any} className="relative min-h-[3em]">
             <AnimatePresence mode="wait">
               <motion.p 
                 key={language}
@@ -179,13 +181,13 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
 
         {isCTA && (
           <motion.div 
-            style={{ translateZ: 140, x: tier1X, y: tier1Y } as any}
-            className="relative z-10 pb-6 flex justify-center w-full"
+            style={{ translateZ: 225, x: tier1X, y: tier1Y } as any}
+            className="relative z-10 pb-2 flex justify-center w-full"
           >
             <motion.div 
               whileHover={{ scale: 1.05, y: -5 }}
               whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-5 bg-black text-white px-12 py-6 rounded-full transition-all duration-700 shadow-[0_30px_60px_rgba(0,0,0,0.3)] group/btn cursor-pointer pointer-events-auto"
+              className="inline-flex items-center gap-4 bg-black text-white px-10 py-5 rounded-full transition-all duration-700 shadow-[0_30px_60px_rgba(0,0,0,0.3)] group/btn cursor-pointer pointer-events-auto"
             >
               <AnimatePresence mode="wait">
                 <motion.span 
@@ -202,7 +204,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
               <motion.span 
                 animate={{ y: [0, -4, 0] }}
                 transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                className="material-icons-outlined text-xl"
+                className="material-icons-outlined text-lg"
               >
                 bolt
               </motion.span>
