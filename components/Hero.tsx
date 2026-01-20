@@ -32,8 +32,8 @@ const SentinelRing: React.FC<{
   return (
     <motion.div
       style={{
-        width: `${60 + index * 24}px`,
-        height: `${60 + index * 24}px`,
+        width: `${80 + index * 32}px`,
+        height: `${80 + index * 32}px`,
         rotateX: rX,
         rotateY: rY,
         translateZ: zDepth,
@@ -62,7 +62,6 @@ const SentinelCore = () => {
     return (y - (rect.top + rect.height / 2)) / (rect.height / 2);
   });
 
-  // FIX: Strictly typed array destructuring for speed calculation
   const speed = useTransform([velX, velY], ([vx, vy]: number[]) => 
     Math.min(Math.sqrt(Math.pow(Number(vx || 0), 2) + Math.pow(Number(vy || 0), 2)) / 15, 1)
   );
@@ -70,21 +69,21 @@ const SentinelCore = () => {
   const springX = useSpring(relX, { stiffness: 45, damping: 35 });
   const springY = useSpring(relY, { stiffness: 45, damping: 35 });
 
-  const rings = useMemo(() => Array.from({ length: 12 }), []);
+  const rings = useMemo(() => Array.from({ length: 14 }), []);
   const rotateX = useTransform(springY, [-1, 1], [35, -35]);
   const rotateY = useTransform(springX, [-1, 1], [-35, 35]);
 
   return (
-    <div ref={containerRef} className="w-full h-full relative group flex items-center justify-center perspective-[2500px] overflow-hidden rounded-[48px] bg-accent/[0.04] dark:bg-black/20 border border-accent/10 transition-colors duration-500">
-      <div className="absolute inset-0 opacity-[0.15] dark:opacity-[0.1] pointer-events-none">
-        {Array.from({ length: 10 }).map((_, i) => (
+    <div ref={containerRef} className="w-full h-full relative group flex items-center justify-center perspective-[2500px] overflow-hidden rounded-[64px] bg-accent/[0.02] dark:bg-black/20 border border-accent/5 transition-all duration-700 hover:border-accent/20">
+      <div className="absolute inset-0 opacity-[0.1] pointer-events-none">
+        {Array.from({ length: 12 }).map((_, i) => (
           <motion.div 
             key={i}
             initial={{ y: "-20%" }}
             animate={{ y: "120%" }}
             transition={{ duration: 6 + i, repeat: Infinity, ease: "linear", delay: i * 0.5 }}
-            style={{ left: `${(i + 1) * 10}%`, width: '1px' } as any}
-            className="absolute h-32 bg-gradient-to-b from-transparent via-accent to-transparent"
+            style={{ left: `${(i + 1) * 8}%`, width: '1px' } as any}
+            className="absolute h-48 bg-gradient-to-b from-transparent via-accent/30 to-transparent"
           />
         ))}
       </div>
@@ -92,29 +91,30 @@ const SentinelCore = () => {
         {rings.map((_, i) => (
           <SentinelRing key={i} index={i} relX={relX} relY={relY} />
         ))}
-        <motion.div style={{ translateZ: 100, scale: useTransform(speed, [0, 1], [1, 0.85]), transformStyle: "preserve-3d" } as any} className="relative z-50">
-          <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center shadow-[0_0_60px_rgba(var(--accent-rgb),0.5)]">
-            <motion.div style={{ scale: useTransform(time, (t: number) => 0.4 + Math.sin(t / 600) * 0.12) } as any} className="w-3.5 h-3.5 rounded-full bg-background" />
+        <motion.div style={{ translateZ: 150, scale: useTransform(speed, [0, 1], [1, 0.7]), transformStyle: "preserve-3d" } as any} className="relative z-50">
+          <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center shadow-[0_0_80px_rgba(var(--accent-rgb),0.6)]">
+            <motion.div style={{ scale: useTransform(time, (t: number) => 0.4 + Math.sin(t / 600) * 0.15) } as any} className="w-4 h-4 rounded-full bg-background" />
           </div>
-          <motion.div animate={{ scale: [1, 1.4, 1], opacity: [0.2, 0.1, 0.2] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="absolute inset-0 -m-8 bg-accent/20 blur-2xl rounded-full -z-10" />
+          <motion.div animate={{ scale: [1, 1.6, 1], opacity: [0.3, 0.1, 0.3] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="absolute inset-0 -m-12 bg-accent/30 blur-3xl rounded-full -z-10" />
         </motion.div>
       </motion.div>
-      <div className="absolute inset-0 z-[60] p-10 flex flex-col justify-between pointer-events-none">
-        <div className="flex justify-between items-start opacity-70">
-          <div className="space-y-1.5">
-            <p className="text-nano uppercase tracking-widest-2x font-semibold text-accent italic">Status // Operational</p>
-            <p className="text-nano font-mono text-accent/90 uppercase">KINETIC_SYNC_v2</p>
+      
+      <div className="absolute inset-0 z-[60] p-12 flex flex-col justify-between pointer-events-none">
+        <div className="flex justify-between items-start opacity-50">
+          <div className="space-y-2">
+            <p className="text-nano uppercase tracking-widest-3x font-bold text-accent italic">SYSTEM_CORE_V2</p>
+            <p className="text-[10px] font-mono text-accent/70 uppercase">PROXIMITY_AWARENESS_ACTIVE</p>
           </div>
-          <div className="text-nano font-mono text-accent text-right uppercase">LATENCY: 0.00ms</div>
+          <div className="text-[10px] font-mono text-accent text-right uppercase tabular-nums tracking-widest">FPS: 120.0</div>
         </div>
         <div className="w-full flex justify-between items-end">
-          <div className="bg-accent/5 backdrop-blur-md border border-accent/10 px-6 py-4 rounded-xl overflow-hidden relative transition-colors hover:bg-accent/10">
-            <p className="text-nano uppercase tracking-widest-2x text-accent/50 mb-1.5 font-bold">Kinetic_Drive</p>
-            <h3 className="text-accent/95 font-display text-base font-medium tracking-tight uppercase">Sentinel_Sync</h3>
+          <div className="bg-accent/[0.03] backdrop-blur-2xl border border-accent/10 px-8 py-5 rounded-2xl relative transition-all hover:bg-accent/10">
+            <p className="text-nano uppercase tracking-widest-2x text-accent/40 mb-1 font-black">SENTINEL</p>
+            <h3 className="text-accent/90 font-display text-lg font-medium tracking-tight uppercase">SYNK_ORBIT</h3>
           </div>
-          <div className="flex gap-2 items-end h-4">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <motion.div key={i} animate={{ height: [4, 12, 4] }} transition={{ repeat: Infinity, duration: 1 + i * 0.1, ease: "easeInOut" }} className="w-[2.5px] bg-accent/50" />
+          <div className="flex gap-1.5 items-end h-6">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <motion.div key={i} animate={{ height: [4, 16, 4] }} transition={{ repeat: Infinity, duration: 0.8 + i * 0.1, ease: "easeInOut" }} className="w-[3px] bg-accent/40" />
             ))}
           </div>
         </div>
@@ -127,46 +127,44 @@ const Hero: React.FC = () => {
   const { t } = useLanguage();
   
   return (
-    <section className="relative w-full min-h-screen flex items-center justify-center pt-24 overflow-hidden bg-background">
-       {/* Background Elements */}
+    <section className="relative w-full min-h-screen flex items-center justify-center pt-24 pb-16 lg:pt-32 overflow-hidden bg-background">
        <div className="absolute inset-0 w-full h-full pointer-events-none">
           <AnamorphicStreak />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] bg-accent/[0.03] blur-[120px] rounded-full mix-blend-screen" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] h-[90vw] bg-accent/[0.02] blur-[150px] rounded-full" />
        </div>
 
-       <div className="max-w-7xl w-full mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
+       <div className="max-w-7xl w-full mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-stretch relative z-10 lg:h-[720px]">
           
-          {/* Text Content */}
-          <div className="lg:col-span-7 flex flex-col items-start text-left">
+          <div className="lg:col-span-7 flex flex-col justify-center text-left py-12 lg:py-0">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="mb-8 inline-flex items-center gap-3 px-4 py-1.5 rounded-full border border-accent/20 bg-accent/[0.05] backdrop-blur-sm"
+              className="mb-8 inline-flex items-center gap-3 px-5 py-2 rounded-full border border-accent/15 bg-accent/[0.03] backdrop-blur-md self-start"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-              <span className="text-nano font-bold uppercase tracking-widest-3x text-accent">
+              <span className="w-2 h-2 rounded-full bg-accent animate-ping opacity-60" />
+              <span className="text-nano font-black uppercase tracking-widest-3x text-accent/80">
                 {t('hero.tag')}
               </span>
             </motion.div>
             
-            <div className="relative mb-10">
-              <h1 className="font-display text-h1-fluid font-medium leading-[0.9] tracking-tight text-text mix-blend-difference">
-                <span className="block overflow-hidden">
+            <div className="relative mb-10 max-w-xl">
+              <h1 className="font-display text-h1-fluid font-medium leading-[0.9] tracking-tight text-text">
+                <span className="block overflow-hidden pb-1">
                   <motion.span 
-                    initial={{ y: "100%" }} 
+                    initial={{ y: "110%" }} 
                     animate={{ y: "0%" }} 
-                    transition={{ duration: 1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+                    transition={{ duration: 1.2, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
                     className="block"
                   >
                     {t('hero.title1')}
                   </motion.span>
                 </span>
-                <span className="block overflow-hidden text-secondary/60">
+                <span className="block overflow-hidden text-secondary/40 italic pb-1">
                    <motion.span 
-                    initial={{ y: "100%" }} 
+                    initial={{ y: "110%" }} 
                     animate={{ y: "0%" }} 
-                    transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                    transition={{ duration: 1.2, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
                     className="block"
                   >
                     {t('hero.title2')}
@@ -174,9 +172,9 @@ const Hero: React.FC = () => {
                 </span>
                 <span className="block overflow-hidden">
                    <motion.span 
-                    initial={{ y: "100%" }} 
+                    initial={{ y: "110%" }} 
                     animate={{ y: "0%" }} 
-                    transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                    transition={{ duration: 1.2, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
                     className="block"
                   >
                     {t('hero.title3')}
@@ -188,8 +186,8 @@ const Hero: React.FC = () => {
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="text-h3-fluid text-secondary font-light max-w-xl leading-relaxed mb-12"
+              transition={{ duration: 1, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="text-body-fluid text-secondary max-w-md leading-relaxed mb-12 opacity-80 font-light"
             >
               {t('hero.desc')}
             </motion.p>
@@ -197,30 +195,30 @@ const Hero: React.FC = () => {
             <motion.div 
                initial={{ opacity: 0, y: 20 }}
                animate={{ opacity: 1, y: 0 }}
-               transition={{ duration: 0.8, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
-               className="flex flex-wrap items-center gap-6"
+               transition={{ duration: 1, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
+               className="flex flex-wrap items-center gap-8"
             >
-              <Magnetic strength={0.3}>
-                <a href="#work" className="bg-accent text-accent-contrast px-8 py-4 rounded-full font-bold text-label-fluid uppercase tracking-widest-2x hover:shadow-[0_0_40px_rgba(var(--accent-rgb),0.4)] transition-all duration-500">
-                  {t('hero.btn')}
+              <Magnetic strength={0.3} radius={200}>
+                <a href="#work" className="group relative bg-accent text-accent-contrast px-10 py-4 rounded-full font-bold text-label-fluid uppercase tracking-widest-2x hover:scale-105 transition-all duration-700 shadow-[0_20px_60px_rgba(255,255,255,0.1)] overflow-hidden">
+                  <span className="relative z-10">{t('hero.btn')}</span>
+                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                 </a>
               </Magnetic>
 
-              <Magnetic strength={0.2}>
-                <button className="px-8 py-4 rounded-full font-bold text-label-fluid uppercase tracking-widest-2x text-text border border-border hover:bg-text hover:text-background transition-all duration-500 flex items-center gap-3 group">
-                   <span className="material-icons-outlined text-lg group-hover:scale-110 transition-transform">play_circle</span>
+              <Magnetic strength={0.2} radius={150}>
+                <button className="px-8 py-4 rounded-full font-bold text-label-fluid uppercase tracking-widest-2x text-text border border-white/10 hover:border-white/40 hover:bg-white/5 transition-all duration-500 flex items-center gap-4 group">
+                   <span className="material-icons-outlined text-xl group-hover:scale-125 transition-transform duration-500">play_circle</span>
                    {t('hero.reel')}
                 </button>
               </Magnetic>
             </motion.div>
           </div>
 
-          {/* Visual Content - Sentinel Core */}
           <motion.div 
-             initial={{ opacity: 0, scale: 0.9, rotateX: 20 }}
-             animate={{ opacity: 1, scale: 1, rotateX: 0 }}
-             transition={{ duration: 1.5, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-             className="lg:col-span-5 relative aspect-square"
+             initial={{ opacity: 0, scale: 0.95, x: 50 }}
+             animate={{ opacity: 1, scale: 1, x: 0 }}
+             transition={{ duration: 1.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+             className="lg:col-span-5 relative"
           >
              <SentinelCore />
           </motion.div>
