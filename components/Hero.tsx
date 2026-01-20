@@ -1,6 +1,6 @@
 
 import React, { useRef, useMemo } from 'react';
-import { motion, AnimatePresence, useSpring, useTransform, useTime, MotionValue } from 'motion/react';
+import { motion, useSpring, useTransform, useTime, MotionValue } from 'motion/react';
 import { useLanguage } from '../context/LanguageContext.tsx';
 import { useKinetic } from '../context/KineticContext.tsx';
 import { Magnetic } from './Magnetic.tsx';
