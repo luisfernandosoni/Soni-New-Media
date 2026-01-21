@@ -1,8 +1,8 @@
 
-import React, { useRef, useMemo } from 'react';
-import { motion, useSpring, useTransform, useTime, MotionValue, AnimatePresence, useInView } from 'motion/react';
+import React, { useRef, useMemo, useId } from 'react';
+import { motion, useSpring, useTransform, useTime, useMotionValue, MotionValue, AnimatePresence, useInView, useMotionTemplate } from 'motion/react';
 import { useLanguage } from '../context/LanguageContext.tsx';
-import { useKinetic } from '../context/KineticContext.tsx';
+import { useKinetic, useRelativeMotion } from '../context/KineticContext.tsx';
 import { Magnetic } from './Magnetic.tsx';
 
 // --- COMPONENT: AnamorphicStreak ---
@@ -19,41 +19,64 @@ const AnamorphicStreak = () => {
   );
 };
 
-// --- COMPONENT: SentinelRing (Isolated) ---
-// Using React.memo to prevent unnecessary re-renders during parent physics updates
+// --- COMPONENT: SentinelRing (Orbital 3D Engine) ---
 const SentinelRing = React.memo(({ 
   index, 
   relX, 
   relY, 
-  isMobile 
+  isMobile,
+  totalRings
 }: { 
   index: number; 
   relX: MotionValue<number>; 
   relY: MotionValue<number>;
   isMobile: boolean;
+  totalRings: number;
 }) => {
-  // 1. Adaptive Logic
-  const depthFactor = isMobile ? 22 : 36;
-  const baseSize = isMobile ? 45 : 80;
-  const sizeStep = isMobile ? 22 : 32;
-
-  const zDepth = index * -depthFactor;
+  // GEOMETRIC STACKING
+  const baseDepth = isMobile ? 14 : 28;
+  const baseSize = isMobile ? 38 : 68;
+  const sizeStep = isMobile ? 24 : 42;
   
-  // 2. Physics Config (Throttled for mobile battery)
-  // useMemo ensures config object stability to prevent useSpring churn
+  // DEPTH: Linear stagger along Z axis (creates the cone "body")
+  const zDepth = index * -baseDepth;
+
+  // PHYSICS: Ultra-smooth inertial tracking
   const springConfig = useMemo(() => ({ 
-    stiffness: 60 - index * 3, 
-    damping: 25 + index,
-    restDelta: isMobile ? 0.01 : 0.001,
-    restSpeed: isMobile ? 0.01 : 0.001
-  }), [index, isMobile]);
+    stiffness: 110 - (index * 4.5), 
+    damping: 38 + (index * 1.6),   
+    mass: 0.7 + (index * 0.1),    
+    restDelta: 0.0001,
+  }), [index]);
 
   const ringSpringX = useSpring(relX, springConfig);
   const ringSpringY = useSpring(relY, springConfig);
   
-  // 3. Transforms
-  const rX = useTransform(ringSpringY, [-1, 1], [54, -54]);
-  const rY = useTransform(ringSpringX, [-1, 1], [-54, 54]);
+  // THE ORBITAL TILT: 
+  // We calculate rotation based on the cursor position. 
+  // Outer rings (higher index) tilt significantly more than inner rings.
+  const rotationIntensity = 45 + (index * 12); 
+  const rX = useTransform(ringSpringY, [0, 1], [rotationIntensity, -rotationIntensity]);
+  const rY = useTransform(ringSpringX, [0, 1], [-rotationIntensity, rotationIntensity]);
+  
+  // THE SPATIAL FOLLOW:
+  // Rings track the cursor, but displacement decreases with depth to maintain cone focus.
+  const followIntensity = useTransform(useMotionValue(index), (i) => 
+    Math.max(0.15, 1 - (i / totalRings) * 0.9)
+  );
+  
+  const moveRange = isMobile ? 35 : 75;
+  const tx = useTransform([ringSpringX, followIntensity], ([x, intensity]) => 
+    ((x as number) - 0.5) * moveRange * (intensity as number)
+  );
+  const ty = useTransform([ringSpringY, followIntensity], ([y, intensity]) => 
+    ((y as number) - 0.5) * moveRange * (intensity as number)
+  );
+
+  // OPTICAL DEPTH: Atmospheric falloff
+  const opacity = useTransform(useMotionValue(index), (i) => 
+    isMobile ? 0.95 - (i / totalRings) * 0.85 : 0.9 - (i / totalRings) * 0.7
+  );
 
   return (
     <motion.div
@@ -62,173 +85,148 @@ const SentinelRing = React.memo(({
         height: `${baseSize + index * sizeStep}px`,
         rotateX: rX,
         rotateY: rY,
+        x: tx,
+        y: ty,
         translateZ: zDepth,
-        opacity: isMobile ? 0.95 - (index * 0.08) : 0.9 - (index * 0.05),
+        opacity,
         transformStyle: "preserve-3d",
+        perspective: "2500px" // Internal perspective for the ring border thickness feel
       } as any}
       className="absolute flex items-center justify-center will-change-transform"
     >
-      {/* Inner Container: Handles Infinite Spin via CSS */}
       <div 
-        className="w-full h-full rounded-full border border-accent/80 dark:border-accent/30 animate-spin"
+        className="w-full h-full rounded-full border border-accent/10 relative"
         style={{
-          borderWidth: isMobile ? '1.5px' : '1px',
-          animationDuration: `${25 + index * 3}s`,
-          animationTimingFunction: 'linear'
+          boxShadow: `0 0 40px rgba(var(--accent-rgb), 0.02)`,
+          background: `radial-gradient(circle at center, transparent 97%, rgba(var(--accent-rgb), 0.08) 100%)`
         }}
-      />
+      >
+        <motion.div 
+          className="w-full h-full rounded-full animate-spin"
+          style={{
+            animationDuration: `${35 + index * 12}s`,
+            animationDirection: index % 2 === 0 ? 'normal' : 'reverse',
+            animationTimingFunction: 'linear',
+            boxShadow: `inset 0 0 0 1px rgba(var(--accent-rgb), 0.15)`,
+          }}
+        />
+      </div>
     </motion.div>
   );
 });
 
-// --- COMPONENT: SentinelAssembly (Extracted for Hook Stability) ---
-// Isolate the map loop to prevent hook count mismatches in the parent
+// --- COMPONENT: SentinelAssembly ---
 const SentinelAssembly: React.FC<{
   relX: MotionValue<number>;
   relY: MotionValue<number>;
   isMobile: boolean;
-  smoothSpeed: MotionValue<number>;
   time: MotionValue<number>;
-  rotateX: MotionValue<number>;
-  rotateY: MotionValue<number>;
-}> = ({ relX, relY, isMobile, smoothSpeed, time, rotateX, rotateY }) => {
-  
-  const ringCount = isMobile ? 9 : 14;
-  // Stable array creation
+}> = ({ relX, relY, isMobile, time }) => {
+  const ringCount = isMobile ? 8 : 14;
   const rings = useMemo(() => Array.from({ length: ringCount }), [ringCount]);
 
   return (
-    <>
-      <div className="absolute inset-0 opacity-[0.1] pointer-events-none">
-        {Array.from({ length: isMobile ? 8 : 12 }).map((_, i) => (
+    <motion.div 
+      style={{ transformStyle: "preserve-3d" } as any} 
+      className="relative w-full h-full flex items-center justify-center"
+    >
+      {/* Background Ambience Layer */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none overflow-hidden">
+        {Array.from({ length: 18 }).map((_, i) => (
           <motion.div 
-            key={`grid-${i}`}
-            initial={{ y: "-20%" }}
-            animate={{ y: "120%" }}
-            transition={{ duration: 6 + i, repeat: Infinity, ease: "linear", delay: i * 0.5 }}
-            style={{ left: `${(i + 1) * (isMobile ? 12 : 8)}%`, width: '1px' } as any}
-            className="absolute h-48 bg-gradient-to-b from-transparent via-accent/30 to-transparent"
+            key={i}
+            className="absolute h-full w-[1px] bg-accent"
+            style={{ left: `${(i + 1) * 5.5}%` } as any}
+            animate={{ opacity: [0, 0.35, 0] }}
+            transition={{ duration: 6, repeat: Infinity, delay: i * 0.15 }}
           />
         ))}
       </div>
 
+      {/* The Kinetic Orbital assembly */}
+      {rings.map((_, i) => (
+        <SentinelRing 
+          key={`ring-${i}`} 
+          index={i} 
+          relX={relX} 
+          relY={relY} 
+          isMobile={isMobile}
+          totalRings={ringCount}
+        />
+      ))}
+      
+      {/* Core Orb (Cone Apex) */}
       <motion.div 
-        style={{ rotateX, rotateY, transformStyle: "preserve-3d" } as any} 
-        className="relative w-full h-full flex items-center justify-center"
+        style={{ 
+          translateZ: isMobile ? 30 : 100, 
+          x: useTransform(relX, [0, 1], [-45, 45]),
+          y: useTransform(relY, [0, 1], [-45, 45]),
+          transformStyle: "preserve-3d"
+        } as any} 
+        className="relative z-50"
       >
-        {rings.map((_, i) => (
-          <SentinelRing 
-            key={`ring-${i}`} 
-            index={i} 
-            relX={relX} 
-            relY={relY} 
-            isMobile={isMobile} 
-          />
-        ))}
-        
-        {/* Core Orb */}
-        <motion.div 
-          style={{ 
-            translateZ: isMobile ? 80 : 150, 
-            scale: useTransform(smoothSpeed, [0, 1], [1, 0.92]), 
-            transformStyle: "preserve-3d" 
-          } as any} 
-          className="relative z-50"
-        >
-          <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-accent flex items-center justify-center shadow-[0_0_80px_rgba(var(--accent-rgb),0.6)]">
-            <motion.div 
-              style={{ scale: useTransform(time, (t: number) => 0.4 + Math.sin(t / 600) * 0.15) } as any} 
-              className="w-3 h-3 lg:w-4 lg:h-4 rounded-full bg-background" 
-            />
-          </div>
+        <div className="w-9 h-9 lg:w-11 lg:h-11 rounded-full bg-accent flex items-center justify-center shadow-[0_0_120px_rgba(var(--accent-rgb),0.8)]">
           <motion.div 
-            animate={{ scale: [1, 1.6, 1], opacity: [0.3, 0.1, 0.3] }} 
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} 
-            className="absolute inset-0 -m-8 lg:-m-12 bg-accent/30 blur-2xl lg:blur-3xl rounded-full -z-10" 
+            style={{ 
+              scale: useTransform(time, (t: number) => 0.25 + Math.sin(t / 800) * 0.05),
+              opacity: useTransform(time, (t: number) => 0.7 + Math.sin(t / 800) * 0.3)
+            } as any} 
+            className="w-2 h-2 lg:w-2.5 lg:h-2.5 rounded-full bg-background" 
           />
-        </motion.div>
+        </div>
+        
+        {/* Volumetric Radial Pulse */}
+        <motion.div 
+          animate={{ scale: [1, 1.6, 1], opacity: [0.3, 0.05, 0.3] }} 
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} 
+          className="absolute inset-0 -m-12 lg:-m-20 bg-accent/35 blur-3xl rounded-full -z-10" 
+        />
       </motion.div>
-    </>
+    </motion.div>
   );
 };
 
-// --- COMPONENT: SentinelCore (Main Physics Engine) ---
+// --- COMPONENT: SentinelCore ---
 const SentinelCore = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  
-  // PERFORMANCE: Spatial Culling
+  const cardId = useId();
   const isInView = useInView(containerRef, { margin: "200px" });
   
-  const { mouseX, mouseY, velX, velY, isMobile } = useKinetic();
+  const { isMobile } = useKinetic();
   const time = useTime();
-
-  // --- UNCONDITIONAL HOOK EXECUTION ---
-  // All hooks declared here run every render, ensuring stability (Fix Error #310)
-
-  const relX = useTransform(mouseX, (x: number) => {
-    if (!containerRef.current) return 0;
-    const rect = containerRef.current.getBoundingClientRect();
-    return (x - (rect.left + rect.width / 2)) / (rect.width / 2);
-  });
-  
-  const relY = useTransform(mouseY, (y: number) => {
-    if (!containerRef.current) return 0;
-    const rect = containerRef.current.getBoundingClientRect();
-    return (y - (rect.top + rect.height / 2)) / (rect.height / 2);
-  });
-
-  const rawSpeed = useTransform([velX, velY], ([vx, vy]: number[]) => {
-    const s = Math.sqrt(Math.pow(Number(vx || 0), 2) + Math.pow(Number(vy || 0), 2));
-    return Math.min(s / 3000, 1);
-  });
-  
-  const smoothSpeed = useSpring(rawSpeed, { 
-    stiffness: 40,
-    damping: 30,
-    mass: 1,
-    restDelta: 0.005
-  });
-
-  const springX = useSpring(relX, { stiffness: 45, damping: 35, restDelta: 0.005 });
-  const springY = useSpring(relY, { stiffness: 45, damping: 35, restDelta: 0.005 });
-
-  const rotateX = useTransform(springY, [-1, 1], [42, -42]);
-  const rotateY = useTransform(springX, [-1, 1], [-42, 42]);
+  const { relX, relY } = useRelativeMotion(cardId, containerRef);
 
   return (
     <div 
       ref={containerRef} 
-      className="w-full h-full min-h-[420px] lg:min-h-0 aspect-square lg:aspect-auto relative group flex items-center justify-center perspective-[2500px] overflow-hidden rounded-[40px] lg:rounded-[64px] bg-accent/[0.02] dark:bg-black/20 border border-accent/5 transition-all duration-700 hover:border-accent/20"
+      className="w-full h-full min-h-[520px] lg:min-h-0 aspect-square lg:aspect-auto relative group flex items-center justify-center perspective-[4000px] overflow-hidden rounded-[72px] lg:rounded-[120px] bg-accent/[0.003] border border-accent/5 transition-all duration-1000 hover:border-accent/15"
     >
-      {/* PERFORMANCE: Strict Separation of Logic and Rendering */}
       {isInView && (
         <SentinelAssembly 
           relX={relX}
           relY={relY}
           isMobile={isMobile}
-          smoothSpeed={smoothSpeed}
           time={time}
-          rotateX={rotateX}
-          rotateY={rotateY}
         />
       )}
       
-      <div className="absolute inset-0 z-[60] p-8 lg:p-12 flex flex-col justify-between pointer-events-none">
-        <div className="flex justify-between items-start opacity-50">
+      {/* HUD UI Elements */}
+      <div className="absolute inset-0 z-[60] p-14 lg:p-24 flex flex-col justify-between pointer-events-none">
+        <div className="flex justify-between items-start opacity-15">
           <div className="space-y-1 lg:space-y-2">
-            <p className="text-[8px] lg:text-nano uppercase tracking-widest-3x font-bold text-accent italic">SYSTEM_CORE_V2</p>
-            <p className="text-[7px] lg:text-[10px] font-mono text-accent/70 uppercase">PROXIMITY_AWARENESS_ACTIVE</p>
+            <p className="text-[6px] lg:text-nano uppercase tracking-widest-3x font-black text-accent italic">ORBIT_CORE_V7.2</p>
+            <p className="text-[5px] lg:text-[9px] font-mono text-accent/40 uppercase">SPATIAL_SYNC_ENABLED</p>
           </div>
-          <div className="text-[7px] lg:text-[10px] font-mono text-accent text-right uppercase tabular-nums tracking-widest">FPS: {isMobile ? '60.0' : '120.0'}</div>
+          <div className="text-[6px] lg:text-[9px] font-mono text-accent text-right uppercase tracking-widest tabular-nums font-black">LATENCY: NULL</div>
         </div>
         <div className="w-full flex justify-between items-end">
-          <div className="bg-accent/[0.03] backdrop-blur-2xl border border-accent/10 px-5 py-3 lg:px-8 lg:py-5 rounded-xl lg:rounded-2xl relative transition-all hover:bg-accent/10">
-            <p className="text-[7px] lg:text-nano uppercase tracking-widest-2x text-accent/40 mb-1 font-black">SENTINEL</p>
-            <h3 className="text-accent/90 font-display text-sm lg:text-lg font-medium tracking-tight uppercase">SYNK_ORBIT</h3>
+          <div className="bg-accent/[0.005] backdrop-blur-3xl border border-accent/5 px-10 py-6 lg:px-16 lg:py-14 rounded-[60px] relative transition-all hover:bg-accent/[0.03] hover:border-accent/15">
+            <p className="text-[6px] lg:text-nano uppercase tracking-widest-2x text-accent/10 mb-4 font-black">SENTINEL_VII</p>
+            <h3 className="text-accent font-display text-xl lg:text-5xl font-medium tracking-tighter uppercase leading-none">ORBITAL</h3>
           </div>
-          <div className="flex gap-1 items-end h-4 lg:h-6">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <motion.div key={i} animate={{ height: [4, 12, 4] }} transition={{ repeat: Infinity, duration: 0.8 + i * 0.1, ease: "easeInOut" }} className="w-[2px] lg:w-[3px] bg-accent/40" />
+          <div className="flex gap-4 items-end h-12 lg:h-20">
+            {Array.from({ length: 16 }).map((_, i) => (
+              <motion.div key={i} animate={{ height: [4, 50, 4] }} transition={{ repeat: Infinity, duration: 0.7 + i * 0.05, ease: "easeInOut" }} className="w-[1px] lg:w-[1.5px] bg-accent/10" />
             ))}
           </div>
         </div>
@@ -252,22 +250,22 @@ const Hero: React.FC = () => {
     <section className="relative w-full min-h-screen flex items-center justify-center pt-24 pb-16 lg:pt-32 overflow-hidden bg-background">
        <div className="absolute inset-0 w-full h-full pointer-events-none">
           <AnamorphicStreak />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] h-[90vw] bg-accent/[0.02] blur-[150px] rounded-full" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] h-[90vw] bg-accent/[0.005] blur-[220px] rounded-full" />
        </div>
 
-       <div className="max-w-7xl w-full mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 items-stretch relative z-10 lg:h-[720px] gap-12 lg:gap-0">
+       <div className="max-w-7xl w-full mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 items-stretch relative z-10 lg:h-[880px] gap-12 lg:gap-0">
           
-          <div className="lg:col-span-5 flex flex-col justify-center text-left py-4 lg:py-0 h-full lg:pr-12">
-            <div className="relative mb-6 lg:mb-8 min-h-[30px] lg:min-h-[40px]">
+          <div className="lg:col-span-5 flex flex-col justify-center text-left py-4 lg:py-0 h-full lg:pr-32">
+            <div className="relative mb-6 lg:mb-18 min-h-[30px] lg:min-h-[40px]">
               <AnimatePresence mode="wait">
                 <motion.div 
                   key={language} 
                   {...variant} 
                   transition={transition}
                 >
-                  <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full border border-accent/15 bg-accent/[0.04] backdrop-blur-md self-start">
-                    <span className="w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full bg-accent animate-ping opacity-60" />
-                    <span className="text-[9px] lg:text-nano font-black uppercase tracking-widest-3x text-accent/80">
+                  <div className="inline-flex items-center gap-6 px-10 py-4.5 rounded-full border border-accent/10 bg-accent/[0.04] backdrop-blur-2xl self-start">
+                    <span className="w-2 h-2 rounded-full bg-accent animate-pulse shadow-[0_0_20px_white]" />
+                    <span className="text-[9px] lg:text-nano font-black uppercase tracking-widest-3x text-accent/90">
                       {t('hero.tag')}
                     </span>
                   </div>
@@ -275,45 +273,46 @@ const Hero: React.FC = () => {
               </AnimatePresence>
             </div>
             
-            <div className="relative mb-6 lg:mb-8">
+            <div className="relative mb-12 lg:mb-20">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={language}
-                  initial={{ opacity: 0, y: 15, scale: 1.01 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -15, scale: 0.99 }}
-                  transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] as const }}
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -24 }}
+                  transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] as const }}
                 >
-                  <h1 className="font-display text-h1-fluid font-medium leading-[0.95] tracking-tight text-text">
-                    <span className="block pb-1">{t('hero.title1')}</span>
-                    <span className="block text-secondary/40 italic pb-1">{t('hero.title2')}</span>
+                  <h1 className="font-display text-h1-fluid font-medium leading-[0.82] tracking-tighter text-text">
+                    <span className="block pb-3">{t('hero.title1')}</span>
+                    <span className="block text-secondary/10 italic pb-3">{t('hero.title2')}</span>
                     <span className="block">{t('hero.title3')}</span>
                   </h1>
                 </motion.div>
               </AnimatePresence>
             </div>
 
-            <div className="relative mb-8 lg:mb-10 min-h-[4em]">
+            <div className="relative mb-20 lg:mb-28 min-h-[4.5em]">
               <AnimatePresence mode="wait">
                 <motion.p 
                   key={language} 
                   {...variant} 
                   transition={transition}
-                  className="text-body-fluid text-secondary max-w-sm leading-relaxed opacity-80 font-light"
+                  className="text-body-fluid text-secondary max-w-sm leading-relaxed opacity-35 font-light italic"
                 >
                   {t('hero.desc')}
                 </motion.p>
               </AnimatePresence>
             </div>
 
-            <div className="flex flex-wrap items-center gap-4 lg:gap-6">
-              <Magnetic strength={0.3} radius={200}>
+            <div className="flex flex-wrap items-center gap-6 lg:gap-16">
+              <Magnetic strength={0.18} radius={280}>
                 <motion.a 
                   href="#work" 
-                  whileHover={{ scale: 1.05 }}
+                  whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="relative bg-accent text-accent-contrast px-8 lg:px-10 py-3.5 lg:py-4 rounded-full font-bold text-[10px] lg:text-label-fluid uppercase tracking-widest-2x transition-all duration-500 shadow-xl hover:shadow-accent/20 flex items-center justify-center w-full sm:w-auto"
+                  className="relative bg-accent text-accent-contrast px-18 lg:px-24 py-6 lg:py-9 rounded-full font-bold text-[10px] lg:text-label-fluid uppercase tracking-widest-2x transition-all duration-700 shadow-2xl hover:shadow-accent/5 flex items-center justify-center w-full sm:w-auto overflow-hidden group"
                 >
+                  <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                   <AnimatePresence mode="wait">
                     <motion.span 
                       key={language} 
@@ -327,12 +326,12 @@ const Hero: React.FC = () => {
                 </motion.a>
               </Magnetic>
 
-              <Magnetic strength={0.2} radius={150}>
+              <Magnetic strength={0.1} radius={240}>
                 <motion.button 
-                  whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.08)' }}
-                  className="px-6 lg:px-8 py-3.5 lg:py-4 rounded-full font-bold text-[10px] lg:text-label-fluid uppercase tracking-widest-2x text-text border border-white/10 transition-all duration-500 flex items-center gap-3 lg:gap-4 group w-full sm:w-auto justify-center"
+                  whileHover={{ scale: 1.02, backgroundColor: 'rgba(255,255,255,0.02)' }}
+                  className="px-14 lg:px-20 py-6 lg:py-9 rounded-full font-bold text-[10px] lg:text-label-fluid uppercase tracking-widest-2x text-text border border-white/5 transition-all duration-700 flex items-center gap-10 group w-full sm:w-auto justify-center"
                 >
-                  <span className="material-icons-outlined text-lg lg:text-xl group-hover:scale-125 transition-transform duration-500">play_circle</span>
+                  <span className="material-icons-outlined text-2xl lg:text-3xl group-hover:rotate-[15deg] transition-transform duration-1000 ease-out">play_circle</span>
                   <AnimatePresence mode="wait">
                     <motion.span 
                       key={language} 
@@ -349,10 +348,10 @@ const Hero: React.FC = () => {
           </div>
 
           <motion.div 
-             initial={{ opacity: 0, scale: 0.95, x: 20 }}
+             initial={{ opacity: 0, scale: 0.85, x: 120 }}
              whileInView={{ opacity: 1, scale: 1, x: 0 }}
              viewport={{ once: true }}
-             transition={{ duration: 1.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] as const }}
+             transition={{ duration: 2.6, delay: 0.7, ease: [0.16, 1, 0.3, 1] as const }}
              className="lg:col-span-7 relative h-auto lg:h-full flex items-center justify-center lg:justify-start"
           >
              <SentinelCore />
