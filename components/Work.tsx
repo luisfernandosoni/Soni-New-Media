@@ -59,7 +59,7 @@ const WorkCardEngine: React.FC<{ item: WorkItem; index: number; cardId: string }
           perspective: 1200,
           "--sx": shineXPercent
         } as any}
-        className="relative overflow-hidden rounded-3xl bg-surface border border-border shadow-2xl transition-shadow duration-500 group-hover:shadow-accent/5 will-change-transform group"
+        className="relative overflow-hidden rounded-[40px] bg-surface border border-border shadow-2xl transition-shadow duration-500 group-hover:shadow-accent/5 will-change-transform group"
       >
         <motion.div 
           style={{ 
@@ -69,7 +69,7 @@ const WorkCardEngine: React.FC<{ item: WorkItem; index: number; cardId: string }
           className="absolute inset-0 z-20 pointer-events-none mix-blend-overlay"
         />
 
-        <div className="relative aspect-[16/10] overflow-hidden">
+        <div className="relative aspect-[16/9] overflow-hidden">
           <motion.img
             src={item.image}
             alt={item.title}
@@ -79,30 +79,30 @@ const WorkCardEngine: React.FC<{ item: WorkItem; index: number; cardId: string }
           
           <motion.div 
             style={{ opacity: useTransform(isOver, (over: number) => over === 1 ? 1 : 0) } as any}
-            className="absolute inset-0 z-10 p-10 flex flex-col justify-between pointer-events-none bg-gradient-to-b from-black/20 via-transparent to-black/60 transition-opacity duration-700"
+            className="absolute inset-0 z-10 p-12 lg:p-16 flex flex-col justify-between pointer-events-none bg-gradient-to-b from-black/20 via-transparent to-black/60 transition-opacity duration-700"
           >
             <div className="flex justify-between items-start">
-              <span className="text-nano font-bold tracking-widest-2x text-white uppercase opacity-70">Archive_{item.year}</span>
-              <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center backdrop-blur-md">
-                <span className="material-icons-outlined text-white text-sm">north_east</span>
+              <span className="text-nano font-black tracking-widest-3x text-white uppercase opacity-70">Archive_{item.year}</span>
+              <div className="w-14 h-14 rounded-full border border-white/20 flex items-center justify-center backdrop-blur-md">
+                <span className="material-icons-outlined text-white text-base">north_east</span>
               </div>
             </div>
             
-            <div className="space-y-4 translate-y-4 group-hover:translate-y-0 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]">
+            <div className="space-y-6 translate-y-6 group-hover:translate-y-0 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]">
               <h3 className="text-white font-display text-h3-fluid font-medium">{item.title}</h3>
-              <p className="text-white/70 text-body-fluid font-light max-w-xs">{item.category}</p>
+              <p className="text-white/70 text-body-fluid font-light max-w-sm">{item.category}</p>
             </div>
           </motion.div>
         </div>
       </motion.div>
 
-      <div className="mt-8 flex justify-between items-end px-2">
-        <div className="space-y-2">
-          <h4 className="text-label-fluid font-semibold text-text uppercase tracking-widest-2x">{item.title}</h4>
-          <p className="text-nano text-secondary font-medium uppercase tracking-widest">{item.category}</p>
+      <div className="mt-12 flex justify-between items-end px-4">
+        <div className="space-y-3">
+          <h4 className="text-label-fluid font-black text-text uppercase tracking-widest-3x">{item.title}</h4>
+          <p className="text-nano text-secondary font-bold uppercase tracking-widest-2x">{item.category}</p>
         </div>
-        <div className="h-[1px] flex-grow mx-8 bg-border opacity-50 mb-3" />
-        <span className="text-nano font-mono text-secondary tabular-nums font-bold mb-1">©{item.year}</span>
+        <div className="h-[1px] flex-grow mx-12 bg-border opacity-50 mb-3" />
+        <span className="text-nano font-mono text-secondary tabular-nums font-black mb-1">©{item.year}</span>
       </div>
     </motion.div>
   );
@@ -116,12 +116,12 @@ const WorkCard: React.FC<{ item: WorkItem; index: number }> = (props) => {
   return (
     <div
       ref={scrollRef}
-      className={`relative min-h-[300px] ${props.item.wide ? 'col-span-1 lg:col-span-2' : 'col-span-1'}`}
+      className={`relative min-h-[400px] ${props.item.wide ? 'col-span-1 lg:col-span-2' : 'col-span-1'}`}
     >
       {isInView ? (
         <WorkCardEngine {...props} cardId={cardId} />
       ) : (
-        <div className="w-full aspect-[16/10] bg-surface/50 border border-border/20 rounded-3xl animate-pulse" />
+        <div className="w-full aspect-[16/9] bg-surface/50 border border-border/20 rounded-[40px] animate-pulse" />
       )}
     </div>
   );
@@ -132,22 +132,22 @@ const Work: React.FC = () => {
   const transition = { duration: 0.4, ease: [0.16, 1, 0.3, 1] as const };
 
   return (
-    <section id="work" className="py-16 lg:py-24 bg-background overflow-hidden scroll-mt-20">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-40 border-l-[3px] border-accent pl-12">
-          <div className="space-y-10 max-w-5xl">
+    <section id="work" className="py-24 lg:py-40 bg-background overflow-hidden scroll-mt-20">
+      <div className="max-w-8xl mx-auto px-10 lg:px-20">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-48 border-l-[4px] border-accent pl-16">
+          <div className="space-y-12 max-w-5xl">
             <AnimatePresence mode="wait">
               <motion.div key={language} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={transition}>
-                <span className="text-label-fluid font-bold uppercase tracking-widest-3x text-secondary block">{t('work.tag')}</span>
-                <h2 className="font-display text-h2-fluid font-medium text-text mt-4">{t('work.title')}</h2>
+                <span className="text-label-fluid font-black uppercase tracking-widest-3x text-secondary block">{t('work.tag')}</span>
+                <h2 className="font-display text-h2-fluid font-medium text-text mt-6">{t('work.title')}</h2>
               </motion.div>
             </AnimatePresence>
           </div>
           <div className="mt-16 md:mt-0 text-right">
              <AnimatePresence mode="wait">
                <motion.div key={language} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ ...transition, delay: 0.1 }}>
-                 <p className="text-secondary/70 max-w-xs text-body-fluid leading-relaxed mb-8 font-light">{t('work.desc')}</p>
-                 <button className="text-label-fluid uppercase tracking-widest-2x font-bold text-accent border-b-2 border-accent pb-1 hover:opacity-60 transition-opacity">
+                 <p className="text-secondary/70 max-w-sm text-body-fluid leading-relaxed mb-10 font-light">{t('work.desc')}</p>
+                 <button className="text-label-fluid uppercase tracking-widest-3x font-black text-accent border-b-[3px] border-accent pb-2 hover:opacity-60 transition-opacity">
                    {t('work.viewArchive')}
                  </button>
                </motion.div>
@@ -155,7 +155,7 @@ const Work: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-20 gap-y-32">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-24 gap-y-40">
           {works.map((work, index) => (
             <WorkCard key={work.id} item={work} index={index} />
           ))}

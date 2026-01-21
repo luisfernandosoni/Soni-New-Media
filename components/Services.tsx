@@ -20,12 +20,12 @@ const Services: React.FC = () => {
   const transition = { duration: 0.4, ease: [0.16, 1, 0.3, 1] as const };
 
   return (
-    <section id="services" className="py-16 lg:py-24 bg-background relative transition-colors duration-500 overflow-hidden scroll-mt-20">
-      <div className="absolute top-0 right-0 w-[1600px] h-[1600px] bg-white/[0.015] blur-[250px] rounded-full -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+    <section id="services" className="py-24 lg:py-40 bg-background relative transition-colors duration-500 overflow-hidden scroll-mt-20">
+      <div className="absolute top-0 right-0 w-[2000px] h-[2000px] bg-white/[0.01] blur-[300px] rounded-full -translate-y-1/2 translate-x-1/3 pointer-events-none" />
       
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-40">
-          <div className="space-y-10 max-w-4xl">
+      <div className="max-w-8xl mx-auto px-10 lg:px-20 relative z-10">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-48">
+          <div className="space-y-12 max-w-4xl">
             <AnimatePresence mode="wait">
               <motion.div 
                 key={language}
@@ -33,10 +33,10 @@ const Services: React.FC = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 10 }}
                 transition={transition}
-                className="inline-flex items-center gap-4 px-6 py-2.5 rounded-full border border-white/10 bg-white/[0.05]"
+                className="inline-flex items-center gap-6 px-8 py-3 rounded-full border border-white/10 bg-white/[0.05]"
               >
-                <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                <span className="text-label-fluid font-bold uppercase tracking-widest-3x text-white/70">
+                <span className="w-2.5 h-2.5 rounded-full bg-white animate-pulse" />
+                <span className="text-nano font-black uppercase tracking-widest-3x text-white/70">
                   {t('services.tag')}
                 </span>
               </motion.div>
@@ -68,7 +68,7 @@ const Services: React.FC = () => {
           </AnimatePresence>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 lg:gap-20">
           {services.map((service, index) => (
             <ServiceCard 
               key={service.id} 

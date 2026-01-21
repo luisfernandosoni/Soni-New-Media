@@ -19,7 +19,6 @@ const Navbar: React.FC = () => {
 
   const navItems = ['services', 'work', 'about'];
 
-  // Global Physics Standard
   const transition = { 
     duration: 0.4, 
     ease: [0.16, 1, 0.3, 1] as const 
@@ -30,26 +29,26 @@ const Navbar: React.FC = () => {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] as const }}
-      className={`fixed top-0 w-full z-50 transition-all duration-500 border-b ${
+      className={`fixed top-0 w-full z-50 transition-all duration-700 border-b ${
         isScrolled
-          ? 'bg-background/80 backdrop-blur-xl border-border py-3'
-          : 'bg-transparent border-transparent py-5'
+          ? 'bg-background/90 backdrop-blur-2xl border-border py-4'
+          : 'bg-transparent border-transparent py-8'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-        <Magnetic strength={0.15} radius={80}>
+      <div className="max-w-8xl mx-auto px-10 lg:px-20 flex items-center justify-between">
+        <Magnetic strength={0.15} radius={100}>
           <a href="#" className="flex items-center group cursor-pointer relative">
-            <Logo size={32} />
+            <Logo size={40} />
           </a>
         </Magnetic>
 
-        <div className="flex items-center space-x-6 lg:space-x-10">
-          <div className="hidden lg:flex items-center space-x-2 text-sm font-medium tracking-wide">
+        <div className="flex items-center space-x-12 lg:space-x-16">
+          <div className="hidden lg:flex items-center space-x-4 text-sm font-medium tracking-wide">
             {navItems.map((item) => (
-              <Magnetic key={item} strength={0.25} radius={60}>
+              <Magnetic key={item} strength={0.25} radius={80}>
                 <a
                   href={`#${item}`}
-                  className="px-4 py-2 text-secondary hover:text-text transition-colors relative group uppercase text-nano font-bold tracking-widest-2x block"
+                  className="px-6 py-2 text-secondary hover:text-text transition-colors relative group uppercase text-nano font-bold tracking-widest-3x block"
                 >
                   <AnimatePresence mode="wait">
                     <motion.span
@@ -64,22 +63,22 @@ const Navbar: React.FC = () => {
                     </motion.span>
                   </AnimatePresence>
                   <motion.span 
-                    className="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-[1.5px] bg-accent transition-all duration-300 group-hover:w-1/2" 
+                    className="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-accent transition-all duration-500 group-hover:w-1/2" 
                   />
                 </a>
               </Magnetic>
             ))}
           </div>
           
-          <div className="flex items-center gap-4 border-l border-border pl-6 lg:pl-10">
-            <div className="flex bg-subtle/50 rounded-full p-1 border border-border">
+          <div className="flex items-center gap-8 border-l border-border pl-12 lg:pl-16">
+            <div className="flex bg-subtle/50 rounded-full p-1.5 border border-border">
               {(['en', 'es'] as const).map((lang) => (
                 <button
                   key={lang}
                   onClick={() => setLanguage(lang)}
-                  className={`px-3 py-1 rounded-full text-[10px] font-black uppercase transition-all duration-300 ${
+                  className={`px-5 py-2 rounded-full text-[11px] font-black uppercase transition-all duration-500 ${
                     language === lang 
-                    ? 'bg-accent text-accent-contrast shadow-sm' 
+                    ? 'bg-accent text-accent-contrast shadow-xl' 
                     : 'text-secondary hover:text-text'
                   }`}
                 >
@@ -89,10 +88,10 @@ const Navbar: React.FC = () => {
             </div>
           </div>
 
-          <Magnetic strength={0.1} radius={100}>
+          <Magnetic strength={0.1} radius={120}>
             <a
               href="#contact"
-              className="hidden md:block bg-accent text-accent-contrast px-6 py-2.5 rounded-full hover:shadow-lg hover:shadow-accent/10 transition-all font-black text-nano uppercase tracking-widest-2x overflow-hidden"
+              className="hidden md:block bg-accent text-accent-contrast px-10 py-4 rounded-full hover:shadow-2xl hover:shadow-accent/20 transition-all font-black text-nano uppercase tracking-widest-3x overflow-hidden"
             >
               <AnimatePresence mode="wait">
                 <motion.span

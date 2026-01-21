@@ -26,15 +26,15 @@ const About: React.FC = () => {
   };
 
   return (
-    <section id="about" className="py-24 lg:py-32 bg-background relative overflow-hidden scroll-mt-20">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+    <section id="about" className="py-32 lg:py-56 bg-background relative overflow-hidden scroll-mt-20">
+      <div className="max-w-8xl mx-auto px-10 lg:px-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-20 lg:gap-32 items-start">
           
-          <div className="lg:col-span-4 space-y-16">
-            <div className="relative min-h-[44px]">
+          <div className="lg:col-span-4 space-y-20">
+            <div className="relative min-h-[50px]">
               <AnimatePresence mode="wait">
                 <motion.div key={language} {...variant} transition={transition}>
-                  <div className="inline-flex items-center gap-6 px-6 py-2.5 rounded-full border border-accent/10 bg-accent/[0.04]">
+                  <div className="inline-flex items-center gap-8 px-8 py-3.5 rounded-full border border-accent/10 bg-accent/[0.04]">
                     <span className="text-nano font-black uppercase tracking-widest-3x text-accent/60">
                       {t('about.tag')}
                     </span>
@@ -43,28 +43,28 @@ const About: React.FC = () => {
               </AnimatePresence>
             </div>
             
-            <div className="space-y-10">
-              <div className="relative min-h-[100px]">
+            <div className="space-y-12">
+              <div className="relative min-h-[120px]">
                 <AnimatePresence mode="wait">
                   <motion.p key={language} {...variant} transition={transition}>
-                    <span className="text-body-fluid text-secondary leading-relaxed font-light opacity-80 max-w-xs block">
+                    <span className="text-body-fluid text-secondary leading-relaxed font-light opacity-80 max-w-sm block">
                       {t('about.desc')}
                     </span>
                   </motion.p>
                 </AnimatePresence>
               </div>
-              <div className="h-[1px] w-20 bg-accent/20" />
+              <div className="h-[2px] w-24 bg-accent/20" />
             </div>
           </div>
 
           <div className="lg:col-span-8">
             <AnimatePresence mode="wait">
               <motion.div key={language} {...variant} transition={{ ...transition, duration: 0.5 }}>
-                <h2 className="font-display text-h2-fluid font-medium text-text mb-16 lg:mb-20">
+                <h2 className="font-display text-h2-fluid font-medium text-text mb-20 lg:mb-32">
                   {t('about.title')}
                 </h2>
                 
-                <p className="text-h3-fluid text-secondary font-light leading-relaxed max-w-2xl opacity-80">
+                <p className="text-h3-fluid text-secondary font-light leading-relaxed max-w-3xl opacity-80">
                   {t('about.manifesto')}
                 </p>
               </motion.div>
@@ -72,7 +72,7 @@ const About: React.FC = () => {
           </div>
         </div>
 
-        <div className="absolute bottom-0 right-0 w-[800px] h-[800px] bg-accent/[0.01] blur-[200px] rounded-full pointer-events-none -z-10" />
+        <div className="absolute bottom-0 right-0 w-[1200px] h-[1200px] bg-accent/[0.01] blur-[250px] rounded-full pointer-events-none -z-10" />
       </div>
     </section>
   );
