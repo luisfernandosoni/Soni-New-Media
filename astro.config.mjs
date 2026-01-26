@@ -1,29 +1,34 @@
-// @ts-check
+// astro.config.mjs
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
 import cloudflare from '@astrojs/cloudflare';
 import keystatic from '@keystatic/astro';
+import markdoc from '@astrojs/markdoc';
+import path from 'path'; // Para los alias
 
-// #MCRD: Astro Edge Architecture
+const isDev = process.env.NODE_ENV === 'development';
+
 export default defineConfig({
-  output: 'server',
-  adapter: cloudflare({
+  output: isDev ? 'static' : 'server',
+  adapter: isDev ? undefined : cloudflare({
     imageService: 'cloudflare',
-    platformProxy: {
-      enabled: true,
-    },
-    // AÑADE ESTA LÍNEA PARA EVITAR ERRORES DE KV:
+    platformProxy: { enabled: true },
     runtime: { mode: 'off' }
   }),
   integrations: [
     react(),
-    tailwind({
-      applyBaseStyles: false, // Preserving original index.css structure
-    }),
+    tailwind({ applyBaseStyles: false }),
     keystatic(),
+    markdoc(),
   ],
   vite: {
+    resolve: {
+      // 1. RECUPERADO: Tus alias de Vite para rutas limpias
+      alias: {
+        '@': path.resolve(process.cwd(), './src'),
+      },
+    },
     ssr: {
       noExternal: ['motion'],
     },
@@ -35,8 +40,8 @@ export default defineConfig({
         name: 'mcrd-inject-css',
         enforce: 'pre',
         transform(code, id) {
-          // Maintaining global CSS injection order for React components
-          if (id.endsWith('index.tsx')) {
+          // 2. ACTUALIZADO: Ahora apunta a App.tsx, el nuevo nucleo
+          if (id.endsWith('App.tsx')) {
             return "import './index.css';\n" + code;
           }
         },

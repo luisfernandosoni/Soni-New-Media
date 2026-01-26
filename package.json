@@ -10,10 +10,10 @@
     "preview": "astro preview",
     "astro": "astro"
   },
-"dependencies": {
+  "dependencies": {
     "@astrojs/cloudflare": "latest",
-    "@astrojs/react": "latest",
     "@astrojs/markdoc": "latest",
+    "@astrojs/react": "latest",
     "@astrojs/tailwind": "latest",
     "@keystatic/astro": "latest",
     "@keystatic/core": "latest",
@@ -28,5 +28,8 @@
     "prettier": "^3.0.0",
     "prettier-plugin-astro": "^0.14.0",
     "typescript": "^5.7.0"
+  },
+  "overrides": {
+    "@keystatic/renderer-react": "npm:@keystatic/document-renderer-react@latest"
   }
 }
