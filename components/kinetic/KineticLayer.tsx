@@ -5,13 +5,13 @@ import { KineticSurfaceContext } from './KineticSurface.tsx';
 
 interface KineticLayerProps {
   children: React.ReactNode;
-  depth: number; // Positive for "towards user", negative for "away"
+  depth: number; 
   className?: string;
 }
 
 /**
- * KINETIC LAYER V1 (2026)
- * Automatically calculates Parallax offsets based on parent Surface state.
+ * KINETIC LAYER V4 (2026) - Spatial Integrity
+ * Balanced leverage multiplier (0.18) to prevent "leaking" outside parent bounds.
  */
 export const KineticLayer: React.FC<KineticLayerProps> = ({ children, depth, className = "" }) => {
   const context = useContext(KineticSurfaceContext);
@@ -23,9 +23,9 @@ export const KineticLayer: React.FC<KineticLayerProps> = ({ children, depth, cla
 
   const { smoothX, smoothY } = context;
 
-  // Parallax Calculation: Higher depth = more movement
-  const x = useTransform(smoothX, [0, 1], [depth * 0.2, -depth * 0.2]);
-  const y = useTransform(smoothY, [0, 1], [depth * 0.2, -depth * 0.2]);
+  // Reduced leverage to keep elements inside the surgical clipping plane
+  const x = useTransform(smoothX, [0, 1], [depth * 0.18, -depth * 0.18]);
+  const y = useTransform(smoothY, [0, 1], [depth * 0.18, -depth * 0.18]);
 
   return (
     <motion.div
