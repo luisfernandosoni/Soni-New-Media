@@ -1,0 +1,66 @@
+---
+// src/pages/index.astro
+import App from '../App';
+import '../index.css';
+
+// #MCRD: Astro Server-Side Rendering Wrapper
+---
+
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Soni New Media | Hybrid Filmmaking Agency</title>
+    
+    <link rel="preload" href="https://assets.soninewmedia.com/fonts/MaterialIconsOutlined.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://assets.soninewmedia.com/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+    <style is:global>
+      @font-face {
+        font-family: 'Inter';
+        src: url('https://assets.soninewmedia.com/fonts/InterVariable.woff2') format('woff2');
+        font-weight: 100 900;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: 'Space Grotesk';
+        src: url('https://assets.soninewmedia.com/fonts/SpaceGrotesk[wght].woff2') format('woff2');
+        font-weight: 300 700;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: 'Material Icons Outlined';
+        src: url('https://assets.soninewmedia.com/fonts/MaterialIconsOutlined.woff2') format('woff2');
+        font-weight: 400;
+        font-style: normal;
+        font-display: block;
+      }
+      .material-icons-outlined {
+        font-family: 'Material Icons Outlined';
+        font-weight: normal;
+        font-style: normal;
+        font-size: 24px;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        display: inline-block;
+        white-space: nowrap;
+        word-wrap: normal;
+        direction: ltr;
+        -webkit-font-feature-settings: 'liga';
+        -webkit-font-smoothing: antialiased;
+      }
+    </style>
+    
+    <script is:inline>
+      if (window.location.hostname.includes('googleusercontent.com')) {
+        console.log('#MCRD: AI Studio Preview Active');
+      }
+    </script>
+  </head>
+  <body>
+    <App client:load />
+    <div class="noise-overlay"></div>
+  </body>
+</html>
