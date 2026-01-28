@@ -24,28 +24,27 @@ const App: React.FC = () => {
           <CustomCursor />
           <Navbar />
 
-          {/* <AnimatePresence mode="wait"> */}
-          <div className="fixed top-0 left-0 bg-red-500 text-white z-[9999] p-2">Debug Active: App Mounted</div>
-          <Routes location={location} key={location.pathname}>
-            <Route path="/" element={
-              <Suspense fallback={<PageLoader />}>
-                <Home />
-              </Suspense>
-            } />
+          <AnimatePresence mode="wait">
+            <Routes location={location} key={location.pathname}>
+              <Route path="/" element={
+                <Suspense fallback={<PageLoader />}>
+                  <Home />
+                </Suspense>
+              } />
 
-            <Route path="/transmissions" element={
-              <Suspense fallback={<PageLoader />}>
-                <Transmissions />
-              </Suspense>
-            } />
+              <Route path="/transmissions" element={
+                <Suspense fallback={<PageLoader />}>
+                  <Transmissions />
+                </Suspense>
+              } />
 
-            <Route path="/transmissions/:slug" element={
-              <Suspense fallback={<PageLoader />}>
-                <TransmissionDetail />
-              </Suspense>
-            } />
-          </Routes>
-          {/* </AnimatePresence> */}
+              <Route path="/transmissions/:slug" element={
+                <Suspense fallback={<PageLoader />}>
+                  <TransmissionDetail />
+                </Suspense>
+              } />
+            </Routes>
+          </AnimatePresence>
         </div>
       </KineticProvider>
     </LanguageProvider>
