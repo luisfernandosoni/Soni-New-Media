@@ -7,11 +7,13 @@
  */
 
 export const onRequest: PagesFunction = async (context) => {
-    const { request } = context;
+    const { request, env } = context;
     const url = new URL(request.url);
 
-    // Target: https://soni-cms.soniglf.workers.dev/_next/...
-    const targetUrl = new URL(url.pathname, 'https://soni-cms.soniglf.workers.dev');
+    const cmsUrl = env.CMS_URL || 'https://soni-cms.soniglf.workers.dev';
+
+    // Target: CMS_URL/_next/...
+    const targetUrl = new URL(url.pathname, cmsUrl);
     targetUrl.search = url.search;
 
     const newRequest = new Request(targetUrl.toString(), {

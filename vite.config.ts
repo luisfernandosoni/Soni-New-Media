@@ -35,7 +35,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     // #MCRD OPTIMIZATION: Minificación agresiva
-    minify: 'esbuild', 
+    minify: 'esbuild',
     cssMinify: true,
     rollupOptions: {
       input: 'index.html',
@@ -57,24 +57,24 @@ export default defineConfig({
     proxy: {
       // API calls al CMS (latest transmissions, search, etc)
       '/api': {
-        target: 'https://soninewmedia.com',
+        target: 'https://soni-cms.soniglf.workers.dev',
         changeOrigin: true,
         secure: true,
         // Reescribe cookies para desarrollo local
         cookieDomainRewrite: 'localhost',
       },
-      // Páginas de transmissions (SSR desde Payload)
-      '/transmissions': {
-        target: 'https://soninewmedia.com',
-        changeOrigin: true,
-        secure: true,
-      },
-      // Admin panel del CMS
+      // Admin panel del CMS - Optional for local dev
       '/admin': {
-        target: 'https://soninewmedia.com',
+        target: 'https://soni-cms.soniglf.workers.dev',
         changeOrigin: true,
         secure: true,
       },
+      // Next.js static assets for CMS admin/preview
+      '/_next': {
+        target: 'https://soni-cms.soniglf.workers.dev',
+        changeOrigin: true,
+        secure: true,
+      }
     },
   },
 });

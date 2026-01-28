@@ -7,16 +7,16 @@
  */
 
 export const onRequest: PagesFunction = async (context) => {
-  const { request, params } = context;
+  const { request, params, env } = context;
   const url = new URL(request.url);
 
   // Construct the target URL
   // We want to forward the path after /api/ to the backend
-  const targetPath = url.pathname; // This keeps the /api/ part which Payload likely expects if mounted there, or we might need to adjust.
-  // Based on vite.config.ts proxy: '/api' -> 'https://soninewmedia.com' (changeOrigin: true)
-  // This implies https://domain.com/api/foo -> https://soninewmedia.com/api/foo
+  const targetPath = url.pathname;
 
-  const targetUrl = new URL(targetPath, 'https://soni-cms.soniglf.workers.dev');
+  const cmsUrl = env.CMS_URL || 'https://soni-cms.soniglf.workers.dev';
+
+  const targetUrl = new URL(targetPath, cmsUrl);
   targetUrl.search = url.search;
 
   // Create a new request to the target
