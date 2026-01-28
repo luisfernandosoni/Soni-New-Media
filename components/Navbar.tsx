@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { useLanguage } from '../context/LanguageContext.tsx';
@@ -11,7 +10,6 @@ const Navbar: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Threshold 50px for transition to glass-morphism
       setIsScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -31,13 +29,17 @@ const Navbar: React.FC = () => {
           : 'bg-transparent border-transparent py-8'
       }`}
     >
-      <div className="max-w-8xl mx-auto px-10 lg:px-20 flex items-center justify-between">
-        {/* Identity Anchor */}
-        <NavBranding />
+      {/* Changed to min-w-0 and gap-based layout for better overflow handling */}
+      <div className="max-w-8xl mx-auto px-6 lg:px-20 flex items-center justify-between gap-4">
+        {/* Identity Anchor - flex-shrink-0 prevents logo from shrinking */}
+        <div className="flex-shrink-0">
+          <NavBranding />
+        </div>
 
-        <div className="flex items-center space-x-12 lg:space-x-16">
-          {/* Navigation Matrix */}
-          <div className="hidden lg:flex items-center space-x-4">
+        {/* Navigation container - uses flex-1 and min-w-0 to handle overflow */}
+        <div className="flex items-center gap-6 lg:gap-12 min-w-0">
+          {/* Navigation Matrix - hidden on smaller screens */}
+          <div className="hidden lg:flex items-center gap-2 xl:gap-4 min-w-0">
             {navItems.map((item) => (
               <NavLinkItem 
                 key={item} 
@@ -46,11 +48,11 @@ const Navbar: React.FC = () => {
                 language={language} 
               />
             ))}
-            {/* Transmissions - External page link */}
+            {/* Transmissions link */}
             <Magnetic strength={0.25} radius={80}>
               <a
                 href="/transmissions"
-                className="px-6 py-2 text-secondary hover:text-text transition-colors relative group uppercase text-nano font-bold tracking-widest-3x block"
+                className="px-4 xl:px-6 py-2 text-secondary hover:text-text transition-colors relative group uppercase text-nano font-bold tracking-widest-3x block whitespace-nowrap"
               >
                 <span className="block">Transmissions</span>
                 <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-accent transition-all duration-500 group-hover:w-1/2" />
@@ -58,8 +60,8 @@ const Navbar: React.FC = () => {
             </Magnetic>
           </div>
           
-          {/* System Actions */}
-          <div className="flex items-center gap-8 border-l border-white/10 pl-12 lg:pl-16">
+          {/* System Actions - reduced padding for better fit */}
+          <div className="flex items-center gap-4 lg:gap-8 border-l border-white/10 pl-6 lg:pl-12">
             <NavLanguageSwitcher 
               current={language} 
               onSelect={setLanguage} 
