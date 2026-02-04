@@ -13,7 +13,7 @@ const transition = {
 
 export const NavBranding: React.FC = React.memo(() => (
   <Magnetic strength={0.15} radius={100}>
-    <Link to="/" className="flex items-center group cursor-pointer relative">
+    <Link to="/" className="flex items-center group cursor-pointer relative" aria-label="Home">
       <Logo size={40} />
     </Link>
   </Magnetic>

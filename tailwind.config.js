@@ -15,7 +15,7 @@ export default {
         "accent-contrast": "#000000",
         subtle: "#1C1C1E",
         text: "#F5F5F7",
-        secondary: "#86868B",
+        secondary: "#A1A1A6",
         border: "rgba(255, 255, 255, 0.08)",
       },
       fontFamily: {

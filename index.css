@@ -60,7 +60,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.22em;
-  color: var(--secondary, #86868B);
+  color: var(--secondary, #A1A1A6);
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -115,7 +115,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.22em;
-  color: var(--secondary, #86868B);
+  color: var(--secondary, #A1A1A6);
 }
 .transmission-card .card-title {
   font-family: 'Space Grotesk', sans-serif;
@@ -127,7 +127,7 @@
 }
 .transmission-card .card-excerpt {
   font-size: 0.95rem;
-  color: var(--secondary, #86868B);
+  color: var(--secondary, #A1A1A6);
   line-height: 1.6;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -136,7 +136,7 @@
 }
 .transmission-card .card-date {
   font-size: 0.8rem;
-  color: var(--secondary, #86868B);
+  color: var(--secondary, #A1A1A6);
   margin-top: 0.5rem;
   letter-spacing: 0.05em;
 }

@@ -36,6 +36,16 @@ export const TransmissionDetail: React.FC = () => {
         }
     }, [slug]);
 
+    useEffect(() => {
+        if (transmission) {
+            document.title = `${transmission.title} — Soni New Media`;
+            const metaDescription = document.querySelector('meta[name="description"]');
+            if (metaDescription) {
+                metaDescription.setAttribute('content', transmission.excerpt || '');
+            }
+        }
+    }, [transmission]);
+
     if (loading) {
         return (
             <div className="min-h-screen pt-40 px-6 lg:px-20 text-center">
