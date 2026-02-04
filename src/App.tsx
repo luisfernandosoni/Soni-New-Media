@@ -8,9 +8,9 @@ import Navbar from './components/Navbar.tsx';
 import { CustomCursor } from './components/CustomCursor.tsx';
 
 // Lazy load pages
-const Home = lazy(() => import('./src/pages/Home.tsx'));
-const Transmissions = lazy(() => import('./src/pages/Transmissions.tsx'));
-const TransmissionDetail = lazy(() => import('./src/pages/TransmissionDetail.tsx'));
+const Home = lazy(() => import('./pages/Home.tsx'));
+const Transmissions = lazy(() => import('./pages/Transmissions.tsx'));
+const TransmissionDetail = lazy(() => import('./pages/TransmissionDetail.tsx'));
 
 const PageLoader = () => <div className="fixed inset-0 bg-background z-40" />;
 

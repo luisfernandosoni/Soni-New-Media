@@ -1,13 +1,13 @@
 import React, { Suspense, lazy } from 'react';
 
 // Lazy load components just like in App.tsx
-const Hero = lazy(() => import('../../components/Hero.tsx'));
-const Services = lazy(() => import('../../components/Services.tsx'));
-const Work = lazy(() => import('../../components/Work.tsx'));
-const About = lazy(() => import('../../components/About.tsx'));
-const TransmissionsPreview = lazy(() => import('../../components/TransmissionsPreview.tsx'));
-const DesignPhilosophy = lazy(() => import('../../components/DesignPhilosophy.tsx'));
-const Footer = lazy(() => import('../../components/Footer.tsx'));
+const Hero = lazy(() => import('../components/Hero.tsx'));
+const Services = lazy(() => import('../components/Services.tsx'));
+const Work = lazy(() => import('../components/Work.tsx'));
+const About = lazy(() => import('../components/About.tsx'));
+const TransmissionsPreview = lazy(() => import('../components/TransmissionsPreview.tsx'));
+const DesignPhilosophy = lazy(() => import('../components/DesignPhilosophy.tsx'));
+const Footer = lazy(() => import('../components/Footer.tsx'));
 
 // Simple loader for sections
 const SectionLoader = () => <div className="w-full h-20 bg-transparent" />;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react'; // Updated import based on new package
-import type { TransmissionPreview, TransmissionsResponse } from '../../types/transmissions';
+import type { TransmissionPreview, TransmissionsResponse } from '../types/transmissions';
 
 const API_URL = '/api/transmissions?limit=100&sort=-publishedAt';
 

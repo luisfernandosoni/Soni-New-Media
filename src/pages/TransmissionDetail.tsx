@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'motion/react';
-import type { TransmissionPreview, TransmissionsResponse } from '../../types/transmissions';
+import type { TransmissionPreview, TransmissionsResponse } from '../types/transmissions';
 
 export const TransmissionDetail: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
